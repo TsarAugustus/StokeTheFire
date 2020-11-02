@@ -3,20 +3,23 @@
 let currentFocus = undefined;
 
 //flags
-let flags = [{
-    fireIsLit: false,
-    createHouse: false
-}];
+let flags = {};
+
+//buildings
+let buildings = [];
 
 let resources = [{
     name: 'wood',
-    amount: 30
+    amount: 100
 }, {
     name: 'stone',
-    amount: 20
+    amount: 100
 }, {
     name: 'leaves',
-    amount: 20
+    amount: 100
+}, {
+    name: 'fire',
+    amount: 0
 }];
 
 let events = [{
@@ -28,7 +31,8 @@ let events = [{
         stone: 5
     }, {
         leaves: 10
-    }]
+    }],
+    building: false
 }, {
     name: 'createHouse',
     desc: 'Create a House',
@@ -38,7 +42,8 @@ let events = [{
         stone: 20
     }, {
         leaves: 20
-    }]
+    }],
+    building: true
 }, {
     name: 'createRainwaterBarrel',
     desc: 'Create a Rainwater Barrel',
@@ -48,10 +53,17 @@ let events = [{
         stone: 10
     }, {
         leaves: 5
-    }]
+    }],
+    building: true
 }];
 
-// let buildings:
+function eventToBuilding(eventName) {
+    let eventToBuilding = events.filter(function(event) {
+        if(eventName === event.name)
+            return event.cost
+    });
+    return eventToBuilding;
+}
 
 function init() {
     let focusableButtons = document.getElementsByClassName('focusable');
@@ -64,6 +76,7 @@ function init() {
     }
 }
 
+
 //if there is a focus, this is where the focus' function will be
 let focus = {
     forage: function() {
@@ -73,8 +86,11 @@ let focus = {
         document.getElementById(randomBasicResource.name).innerHTML = resourceName + ' : ' + randomBasicResource.amount;
     },
     createCleanWater: function() {
-        console.log('here')
     }
+}
+
+function fire() {
+
 }
 
 function getEvent(eventName) {
@@ -106,14 +122,42 @@ function getEvent(eventName) {
             let resourceCost = resource.substring(resource.indexOf(':') + 1);
             for(let playerResource of resources) {
                 if(playerResource.name === resourceName) {
-                    flags[0][eventName] = true;
+                    flags[eventName] = true;
                     playerResource.amount = resourceCost;
                 }
             }
         }
         document.getElementById(eventName).style.display = 'none';
+        if(findEvent[0].building) {
+            let buildingHtml = [];
+            //creates a building object dynamically
+            let newBuilding = {};
+            newBuilding.name = findEvent[0].name;
+            newBuilding.cost = [];
+            newBuilding.desc = findEvent[0].desc;
+            for(let resource of eventToBuilding(findEvent[0].name)[0].cost) {
+                newBuilding.cost.push(resource);
+                let name = Object.keys(resource)[0];
+                let cost = Object.values(resource)[0];
+                let nameCost = (name.charAt(0).toUpperCase() + name.slice(1)) + ' : ' + cost;
+                buildingHtml.push(nameCost);
+            }
+            buildings.push(newBuilding)
+
+
+            let buildingDiv = document.getElementById('buildingDiv');
+            let buildingElement = document.createElement('button');
+            buildingElement.setAttribute('id', 'upgrade-' + findEvent[0].name);
+            buildingElement.setAttribute('onclick', 'upgradeBuilding(\'' + findEvent[0].name + '\')');
+            buildingElement.innerHTML = newBuilding.desc + '<br>' + buildingHtml.join('<br>');
+            buildingDiv.appendChild(buildingElement);
+        }
     }
     update();
+}
+
+function upgradeBuilding(x) {
+    console.log(x)
 }
 
 function checkIfEventIsAvailable(eventName) {
@@ -144,7 +188,7 @@ function update() {
     let findBasicResourceAmt = resources.filter(function(resource) {
         for(let span of basicResourceSpans) {
             if(span.id === resource.name) {
-                let name = resource.name.charAt(0).toUpperCase() + resource.name.slice(1)
+                let name = resource.name.charAt(0).toUpperCase() + resource.name.slice(1);
                 span.innerHTML = name + ' : ' + resource.amount;
             }
         }
@@ -161,7 +205,10 @@ function tick() {
     for(let event of events) {
         checkIfEventIsAvailable(event);
     }
-    console.log(flags)
+
+    if(flags.createFire) {
+        fire();
+    }
     update();
     // evaluateFlags();
 }
