@@ -21,15 +21,19 @@ let resources = [{
     amount: 100,
     type: ['basic']
 }, {
+    name: 'pinecone',
+    amount: 100,
+    type: ['fuel', 'basic']
+}, {
     name: 'fire',
     amount: 0
 }, {
     name: 'coal',
-    amount: 1,
+    amount: 0,
     type: ['fuel']
 }, {
     name: 'charcoal',
-    amount: 2,
+    amount: 0,
     type: ['fuel']
 }];
 
@@ -84,28 +88,20 @@ function init() {
     for(let button of focusableButtons) {
         button.onclick = function() { currentFocus = button.id };
     }
-    let setBasicResources = resources.filter(function(resource) {
-        for(let basicResource in resource.type) {
-            if(resource.type[basicResource] === 'basic') {
-                let basicResourcesDiv = document.getElementById('basicResources');
-                let basicResourceElement = document.createElement('p');
-
-                let resourceName = resource.name.charAt(0).toUpperCase() + resource.name.slice(1);
-                basicResourceElement.setAttribute('id', resource.name);
-                basicResourceElement.innerHTML = resourceName + ' : ' + resource.amount;
-                basicResourcesDiv.appendChild(basicResourceElement);
-            }
+    let setResources = resources.filter(function(resource) {
+        let name = resource.name.charAt(0).toUpperCase() + resource.name.slice(1);
+        for(let resourceType in resource.type) {
+            if(!document.getElementById(resource.name)) {
+                let type = resource.type[resourceType]
+                let typeDiv = document.getElementById(type + 'Resources');
+                
+                let resourceElement = document.createElement('p');
+                resourceElement.setAttribute('id', resource.name);
+                resourceElement.innerHTML = name + ' : ' + resource.amount;
+                typeDiv.appendChild(resourceElement);
+            };            
         }
-        // console.log(resource)
     });
-
-        // for(let resource of resources) {
-        //     let basicResourcesDiv = document.getElementById('basicResources');
-
-        //     // let resourceName = resource.name.charAt(0).toUpperCase() + resource.name.slice(1);
-        //     // document.getElementById(resource.name).innerHTML = resourceName + ' : ' + resource.amount;
-        // }
-    // }
     
     document.getElementById('stoke').onclick = function() { stoke() } ;
 }
@@ -116,12 +112,15 @@ let focus = {
     forage: function() {
         let basicResources = [];
         let findBasicResources = resources.filter(function(resource) {
-            if( resource.name === 'wood' || 
-                resource.name === 'stone' || 
-                resource.name === 'leaves') {
-                basicResources.push(resource);
+            for(let type in resource.type) {
+                console.log()
+                if(resource.type[type] === 'basic') {
+                    basicResources.push(resource);
+                }
             }
-        })
+            return basicResources;         
+            
+        });
         let randomBasicResource = basicResources[Math.floor(Math.random() * basicResources.length)];
         randomBasicResource.amount++;
         let resourceName = randomBasicResource.name.charAt(0).toUpperCase() + randomBasicResource.name.slice(1);
@@ -232,14 +231,15 @@ function checkIfEventIsAvailable(eventName) {
 }
 
 function update() {
-    let basicResourceSpans = document.getElementsByClassName('basicResource');
-    let findBasicResourceAmt = resources.filter(function(resource) {
-        for(let span of basicResourceSpans) {
-            if(span.id === resource.name) {
-                let name = resource.name.charAt(0).toUpperCase() + resource.name.slice(1);
-                span.innerHTML = name + ' : ' + resource.amount;
-            }
+    let updateResources = resources.filter(function(resource) {
+        if(resource.amount <= 0) {
+            document.getElementById(resource.name).style.visibility = 'hidden'
+        } else {
+            let name = resource.name.charAt(0).toUpperCase() + resource.name.slice(1);
+            document.getElementById(resource.name).style.visibility = 'visible'
+            document.getElementById(resource.name).innerHTML = name + ' : ' + resource.amount;
         }
+        
     });
 }
 
