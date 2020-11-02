@@ -10,16 +10,27 @@ let buildings = [];
 
 let resources = [{
     name: 'wood',
-    amount: 100
+    amount: 100,
+    type: ['basic', 'fuel']
 }, {
     name: 'stone',
-    amount: 100
+    amount: 100,
+    type: ['basic']
 }, {
     name: 'leaves',
-    amount: 100
+    amount: 100,
+    type: ['basic']
 }, {
     name: 'fire',
     amount: 0
+}, {
+    name: 'coal',
+    amount: 1,
+    type: ['fuel']
+}, {
+    name: 'charcoal',
+    amount: 2,
+    type: ['fuel']
 }];
 
 let events = [{
@@ -73,10 +84,30 @@ function init() {
     for(let button of focusableButtons) {
         button.onclick = function() { currentFocus = button.id };
     }
-    for(let resource of resources) {
-        let resourceName = resource.name.charAt(0).toUpperCase() + resource.name.slice(1);
-        document.getElementById(resource.name).innerHTML = resourceName + ' : ' + resource.amount;
-    }
+    let setBasicResources = resources.filter(function(resource) {
+        for(let basicResource in resource.type) {
+            if(resource.type[basicResource] === 'basic') {
+                let basicResourcesDiv = document.getElementById('basicResources');
+                let basicResourceElement = document.createElement('p');
+
+                let resourceName = resource.name.charAt(0).toUpperCase() + resource.name.slice(1);
+                basicResourceElement.setAttribute('id', resource.name);
+                basicResourceElement.innerHTML = resourceName + ' : ' + resource.amount;
+                basicResourcesDiv.appendChild(basicResourceElement);
+            }
+        }
+        // console.log(resource)
+    });
+
+        // for(let resource of resources) {
+        //     let basicResourcesDiv = document.getElementById('basicResources');
+
+        //     // let resourceName = resource.name.charAt(0).toUpperCase() + resource.name.slice(1);
+        //     // document.getElementById(resource.name).innerHTML = resourceName + ' : ' + resource.amount;
+        // }
+    // }
+    
+    document.getElementById('stoke').onclick = function() { stoke() } ;
 }
 
 
@@ -102,6 +133,10 @@ let focus = {
 
 function fire() {
 
+}
+
+function stoke() {
+    let find
 }
 
 function getEvent(eventName) {
