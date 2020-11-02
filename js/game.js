@@ -1,8 +1,12 @@
 'use strict';
 
 let currentFocus = undefined;
-let fireIsLit = false;
-let createHouse = false;
+
+//flags
+let flags = [{
+    fireIsLit: false,
+    createHouse: false
+}];
 
 let resources = [{
     name: 'wood',
@@ -24,8 +28,7 @@ let events = [{
         stone: 5
     }, {
         leaves: 10
-    }],
-    activateFlags: ['fireIsLit']
+    }]
 }, {
     name: 'createHouse',
     desc: 'Create a House',
@@ -35,9 +38,20 @@ let events = [{
         stone: 20
     }, {
         leaves: 20
-    }],
-    activateFlags: ['createHouse']
+    }]
+}, {
+    name: 'createRainwaterBarrel',
+    desc: 'Create a Rainwater Barrel',
+    cost: [{
+        wood: 25
+    }, {
+        stone: 10
+    }, {
+        leaves: 5
+    }]
 }];
+
+// let buildings:
 
 function init() {
     let focusableButtons = document.getElementsByClassName('focusable');
@@ -92,6 +106,7 @@ function getEvent(eventName) {
             let resourceCost = resource.substring(resource.indexOf(':') + 1);
             for(let playerResource of resources) {
                 if(playerResource.name === resourceName) {
+                    flags[0][eventName] = true;
                     playerResource.amount = resourceCost;
                 }
             }
@@ -146,7 +161,9 @@ function tick() {
     for(let event of events) {
         checkIfEventIsAvailable(event);
     }
+    console.log(flags)
     update();
+    // evaluateFlags();
 }
 
 setInterval(tick, 1000)
