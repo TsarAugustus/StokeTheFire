@@ -25,6 +25,7 @@ let resources = [{
 let events = [{
     name: 'createFire',
     desc: 'Create a fire',
+    shorthand: 'Fire',
     cost: [{
         wood: 10
     }, {
@@ -36,6 +37,7 @@ let events = [{
 }, {
     name: 'createHouse',
     desc: 'Create a House',
+    shorthand: 'House',
     cost: [{
         wood: 20
     }, {
@@ -47,6 +49,7 @@ let events = [{
 }, {
     name: 'createRainwaterBarrel',
     desc: 'Create a Rainwater Barrel',
+    shorthand: 'Rainwater Barrel',
     cost: [{
         wood: 25
     }, {
@@ -80,7 +83,15 @@ function init() {
 //if there is a focus, this is where the focus' function will be
 let focus = {
     forage: function() {
-        let randomBasicResource = resources[Math.floor(Math.random() * resources.length)];
+        let basicResources = [];
+        let findBasicResources = resources.filter(function(resource) {
+            if( resource.name === 'wood' || 
+                resource.name === 'stone' || 
+                resource.name === 'leaves') {
+                basicResources.push(resource);
+            }
+        })
+        let randomBasicResource = basicResources[Math.floor(Math.random() * basicResources.length)];
         randomBasicResource.amount++;
         let resourceName = randomBasicResource.name.charAt(0).toUpperCase() + randomBasicResource.name.slice(1);
         document.getElementById(randomBasicResource.name).innerHTML = resourceName + ' : ' + randomBasicResource.amount;
@@ -135,6 +146,8 @@ function getEvent(eventName) {
             newBuilding.name = findEvent[0].name;
             newBuilding.cost = [];
             newBuilding.desc = findEvent[0].desc;
+            newBuilding.shorthand = findEvent[0].shorthand;
+            newBuilding.amount = 1;
             for(let resource of eventToBuilding(findEvent[0].name)[0].cost) {
                 newBuilding.cost.push(resource);
                 let name = Object.keys(resource)[0];
@@ -143,13 +156,13 @@ function getEvent(eventName) {
                 buildingHtml.push(nameCost);
             }
             buildings.push(newBuilding)
-
+            let amt = '<br> # of ' + newBuilding.shorthand + 's ' + newBuilding.amount
 
             let buildingDiv = document.getElementById('buildingDiv');
             let buildingElement = document.createElement('button');
             buildingElement.setAttribute('id', 'upgrade-' + findEvent[0].name);
             buildingElement.setAttribute('onclick', 'upgradeBuilding(\'' + findEvent[0].name + '\')');
-            buildingElement.innerHTML = newBuilding.desc + '<br>' + buildingHtml.join('<br>');
+            buildingElement.innerHTML = newBuilding.desc + '<br>' + buildingHtml.join('<br>') + amt;
             buildingDiv.appendChild(buildingElement);
         }
     }
