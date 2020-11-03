@@ -1,6 +1,7 @@
 'use strict';
 
 let currentFocus = undefined;
+let tickAmt = 0;
 
 //flags
 let flags = {};
@@ -8,6 +9,11 @@ let flags = {};
 //buildings
 let buildings = [];
 
+//this is all the resources available in the game
+//the 'type' tag indicates what the resource can be used for
+//resource types should first be described by what their primary function is,
+//eg fuel vs basic materials vs metals
+//the type is then display by the according div (basicResources, fuelResources, metalResources, etc)
 let resources = [{
     name: 'wood',
     amount: 100,
@@ -35,7 +41,33 @@ let resources = [{
     name: 'charcoal',
     amount: 0,
     type: ['fuel']
+}, {
+    name: 'copper',
+    amount: 1,
+    type: ['metal']
+}, {
+    name: 'clay',
+    amount: 1,
+    type: ['moldable']
 }];
+
+let notifications = [{
+    name: 'lightFireNotification',
+    desc: 'It\'s cold and dark. I should light a fire.',
+    flags: ['!createFire']
+}, {
+    name: 'findWaterNotification',
+    desc: 'Maybe I can collect rain?',
+    flags: ['!createRainwaterBarrel']
+}, {
+    name: 'makeCleanWaterNotification',
+    desc: 'If I boil this water, maybe I can use it.',
+    flags: ['createRainwaterBarrel', 'createFire']
+}, {
+    name: 'generalNotification',
+    desc: 'Life is good.',
+    flags: ['createFire']
+}]
 
 let events = [{
     name: 'createFire',
@@ -113,7 +145,6 @@ let focus = {
         let basicResources = [];
         let findBasicResources = resources.filter(function(resource) {
             for(let type in resource.type) {
-                console.log()
                 if(resource.type[type] === 'basic') {
                     basicResources.push(resource);
                 }
@@ -243,8 +274,66 @@ function update() {
     });
 }
 
+function checkIfNewNotificationIsAvailable() {
+    //scoped variable
+    let flagKeys = Object.keys(flags);
+    let doesFlagExist = function(flagName) {
+        //finding if flags exist is easy
+        //return the flag name(including the !), and its status based on the name
+        //eg, if the flag !createFire is needed, but this returns true, then its false
+        //big brain time
+        let flagContainer = [];
+        for(let thisFlagName of flagName) {
+            let flagInfo = {
+                flagName: undefined,
+                eval: undefined
+            };
+            if(thisFlagName.charAt(0) === '!') {
+                let newFlagName = thisFlagName.substring(1);
+                if(flags[newFlagName] === undefined) { //flag needs to be  false, and flag doesn't exist  
+                    flagInfo.flagName = thisFlagName;
+                    flagInfo.eval = true;
+                    // flagContainer.push(thisFlagName, true);
+                } else if(flags[newFlagName] === true) { //flag needs to be false, but flag exists
+                    flagInfo.flagName = thisFlagName;
+                    flagInfo.eval = false;
+                    // flagContainer.push(thisFlagName, false)
+                }
+            } else if(flags[thisFlagName] === true) { //flag needs to be true, and exists
+                flagInfo.flagName = thisFlagName;
+                flagInfo.eval = true;
+                // flagContainer.push(thisFlagName, true)
+            } else if(flags[thisFlagName] === undefined) { //flag needs to be true, but doesnt exist
+                flagInfo.flagName = thisFlagName;
+                flagInfo.eval = false;
+                // flagContainer.push(thisFlagName, false)
+            }
+            flagContainer.push(flagInfo);
+        }
+        return flagContainer;
+    }
+
+    //finally, iterate through the notifications and find available ones according to their corresponding location    
+    let filterNotificationsByFlag = notifications.filter(function(thisNotification) {
+        let notificationContainer = [];
+        let notificationFlagKeys = thisNotification.flags;
+        let flagStatus = doesFlagExist(notificationFlagKeys);
+        for(let amt of flagStatus) {
+            if(amt.eval === true) {
+                notificationContainer.push(true)
+            }
+        }
+        if(notificationContainer.length === thisNotification.flags.length) {
+            document.getElementById('notification').innerHTML = thisNotification.desc;
+        }
+    });
+}
+
 //tick is a function that calls the update() function to screenuipdate
 function tick() {
+    if((tickAmt % 10) === 0) {
+        checkIfNewNotificationIsAvailable();
+    }
     if(currentFocus !== undefined) {
         //very neat
         focus[currentFocus]()
@@ -256,9 +345,19 @@ function tick() {
 
     if(flags.createFire) {
         fire();
+        document.getElementById('stoke').style.display = 'block';
+    } else {
+        document.getElementById('stoke').style.display = 'none';
     }
+
+    if(flags.createRainwaterBarrel) {
+        document.getElementById('createCleanWater').style.display = 'block';
+    } else {
+        document.getElementById('createCleanWater').style.display = 'none';
+    }
+
     update();
-    // evaluateFlags();
+    tickAmt++;
 }
 
 setInterval(tick, 1000)

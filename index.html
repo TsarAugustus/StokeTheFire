@@ -1,14 +1,26 @@
 <html>
     <head>
         <title>Stoke the Fire</title>
+        <link rel="stylesheet"  href="./stylesheets/style.css"></link>
     </head>
     <body>
         <h1>Stoke the Fire</h1>
-        <div id="basicResources"> 
-            <h2>Basic Resources</h2>
+        <div id="notificationDiv">
+            <span id="notification"></span>
         </div>
-        <div id="fuelResources"> 
-            <h2>Fuel</h2>
+        <div id="resources">
+            <div class="resourceDiv" id="basicResources"> 
+                <h4>Basics</h4>
+            </div>
+            <div class="resourceDiv" id="fuelResources"> 
+                <h4>Fuels</h4>
+            </div>
+            <div class="resourceDiv" id="moldableResources"> 
+                <h4>Moldables</h4>
+            </div>
+            <div class="resourceDiv" id="metalResources"> 
+                <h4>Metals</h4>
+            </div>
         </div>
         <div id="gameDiv">
             <button class="focusable" id="forage">Forage</button>
