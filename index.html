@@ -4,35 +4,55 @@
         <link rel="stylesheet"  href="./stylesheets/style.css"></link>
     </head>
     <body>
-        <h1>Stoke the Fire</h1>
-        <div id="notificationDiv">
-            <span id="notification"></span>
-        </div>
-        <div id="resources">
-            <div class="resourceDiv" id="basicResources"> 
-                <h4>Basics</h4>
-            </div>
-            <div class="resourceDiv" id="fuelResources"> 
-                <h4>Fuels</h4>
-            </div>
-            <div class="resourceDiv" id="moldableResources"> 
-                <h4>Moldables</h4>
-            </div>
-            <div class="resourceDiv" id="metalResources"> 
-                <h4>Metals</h4>
+        <div id="left">
+            <div id="resources">
+                <div class="resourceDiv" id="basicResources"> 
+                    <!-- <h4>Basics</h4> -->
+                </div>
+                <div class="resourceDiv" id="fuelResources"> 
+                    <!-- <h4>Fuels</h4> -->
+                </div>
+                <div class="resourceDiv" id="moldableResources"> 
+                    <!-- <h4>Moldables</h4> -->
+                </div>
+                <div class="resourceDiv" id="metalResources"> 
+                    <!-- <h4>Metals</h4> -->
+                </div>
             </div>
         </div>
-        <div id="gameDiv">
-            <button class="focusable" id="forage">Forage</button>
-            <p><span id="fire"></span></p>
-            <button id="stoke">Stoke the fire</button>
-            <button class="focusable" id="createCleanWater">Create Clean Water</button>
+        <div id="middle">   
+            <div id="notificationDiv">
+                <span id="notification"></span>
+            </div>    
+            <h1>Stoke the Fire</h1> 
+            
+            <div id="gameDiv">
+                <button class="focusable" id="forage">Forage</button>
+                    <div>
+                        <p><span id="fire"></span></p>
+                        <button id="stoke">Stoke the fire</button>
+                        <div id="fuelChoices">
+                    </div>
+                </div>
+                <button class="focusable" id="createCleanWater">Create Clean Water</button>
+            </div>
         </div>
-        <div id="eventsDiv">
+        
+        <div id="right">
+            <div id="alignmentDiv">
+                <button class="alignment"></button>
+                <button class="alignment"></button>
+                <button class="alignment"></button>
+                <button class="alignment"></button>
+                <button class="alignment"></button>
+                <button class="alignment"></button>
+            </div>
+            <div id="eventsDiv">
 
-        </div>
-        <div id="buildingDiv">
-
+            </div>
+            <div id="buildingDiv">
+    
+            </div>
         </div>
         <script src="./js/game.js"></script>
     </body>

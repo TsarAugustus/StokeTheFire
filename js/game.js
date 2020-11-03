@@ -1,6 +1,7 @@
 'use strict';
 
 let currentFocus = undefined;
+let selectingFuel = false;
 let tickAmt = 0;
 
 //flags
@@ -17,37 +18,48 @@ let buildings = [];
 let resources = [{
     name: 'wood',
     amount: 100,
+    cap: 100,
+    woodEquivalent: 1,
     type: ['basic', 'fuel']
 }, {
     name: 'stone',
     amount: 100,
+    cap: 100,
     type: ['basic']
 }, {
     name: 'leaves',
     amount: 100,
+    cap: 100,
     type: ['basic']
 }, {
     name: 'pinecone',
-    amount: 100,
+    amount: 0,
+    cap: 100,
+    woodEquivalent: 2,
     type: ['fuel', 'basic']
 }, {
     name: 'fire',
-    amount: 0
+    amount: 100,
+    cap: 100,
+    decay: 1,
+    type: ['fire']
 }, {
     name: 'coal',
-    amount: 0,
+    amount: 5,
+    woodEquivalent: 4,
     type: ['fuel']
 }, {
     name: 'charcoal',
-    amount: 0,
+    amount: 2,
+    woodEquivalent: 3,
     type: ['fuel']
 }, {
     name: 'copper',
-    amount: 1,
+    amount: 0,
     type: ['metal']
 }, {
     name: 'clay',
-    amount: 1,
+    amount: 0,
     type: ['moldable']
 }];
 
@@ -162,11 +174,62 @@ let focus = {
 }
 
 function fire() {
+    let fireDiv = document.getElementById('fire');
+    let findFire = resources.find(function(resource) {
+        return resource.name === 'fire';
+    });
 
+    if(findFire.amount <= findFire.cap && findFire.amount !== 0) {
+        findFire.amount = findFire.amount - findFire.decay;
+        fireDiv.innerHTML = findFire.amount;
+    } 
+}
+
+function stokeFuel(fuelType) {
+    let fuelName = fuelType.slice(0, -4);
+    let findFuel = resources.find(function(resource) {
+        if(resource.name === fuelName) { return resource }
+    });
+    let findFire = resources.find(function(resource) {
+        if(resource.name === 'fire') { return resource }
+    });
+
+    if((findFire.amount + (1 * findFuel.woodEquivalent)) >= findFire.cap) {
+        findFire.amount = findFire.cap;
+    } else {
+        findFire.amount = findFire.amount + (1 * findFuel.woodEquivalent);
+    }
+
+    findFuel.amount -= 1;
+    let choiceFuelDivs = document.getElementsByClassName('choiceResources');
+    while(choiceFuelDivs[0]) {
+        choiceFuelDivs[0].parentNode.removeChild(choiceFuelDivs[0])
+    }
+    selectingFuel = false;
+    update();
 }
 
 function stoke() {
-    let find
+    let stokeDiv = document.getElementById('stoke');
+    stokeDiv.style.display = 'none';
+    selectingFuel = true;
+    let fuelChoicesDiv = document.getElementById('fuelChoices');
+    let findFuelResources = resources.filter(function(resource) {
+        for(let type of resource.type) {
+            if(type === 'fuel' && resource.amount > 0) { return resource }
+        }
+    });
+
+    for(let fuel of findFuelResources) {
+        let choices = document.createElement('button');
+        let fuelNameId = fuel.name + 'Fuel'
+        choices.setAttribute('id', fuelNameId);
+        choices.setAttribute('onclick', 'stokeFuel(\'' + fuelNameId + '\')');
+        choices.setAttribute('class', 'choiceResources')
+        choices.innerHTML = fuel.name + '<br>' + '#: ' + fuel.amount;
+        fuelChoicesDiv.appendChild(choices);
+    }
+    
 }
 
 function getEvent(eventName) {
@@ -272,6 +335,23 @@ function update() {
         }
         
     });
+
+    // These are in update instead of tick, so the elements display once these are researched
+    if(flags.createFire && selectingFuel === false) {
+        document.getElementById('stoke').style.display = 'block';
+        document.getElementById('fire').style.display = 'block';
+    } else if(flags.createFire && selectingFuel === true) {
+        document.getElementById('stoke').style.display = 'none';
+    } else if(!flags.createFire) {
+        document.getElementById('fire').style.display = 'none';
+        document.getElementById('stoke').style.display = 'none';
+    }
+
+    if(flags.createRainwaterBarrel) {
+        document.getElementById('createCleanWater').style.display = 'block';
+    } else {
+        document.getElementById('createCleanWater').style.display = 'none';
+    }
 }
 
 function checkIfNewNotificationIsAvailable() {
@@ -343,17 +423,9 @@ function tick() {
         checkIfEventIsAvailable(event);
     }
 
+    //not in update, as it this is the fire game logic
     if(flags.createFire) {
         fire();
-        document.getElementById('stoke').style.display = 'block';
-    } else {
-        document.getElementById('stoke').style.display = 'none';
-    }
-
-    if(flags.createRainwaterBarrel) {
-        document.getElementById('createCleanWater').style.display = 'block';
-    } else {
-        document.getElementById('createCleanWater').style.display = 'none';
     }
 
     update();

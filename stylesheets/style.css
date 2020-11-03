@@ -1,21 +1,51 @@
 * {
     margin: 0 auto;
 }
-
-#resources {
+body {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    overflow: hidden;
 }
+
+/* Left side of Screen */
+#left {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 2;
+}
+#resources {
+    display: flex;
+    flex-direction: column;
+}
+
 .resourceDiv {
-    width: 20%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =================== */
+
+/* Middle of Screen */
+
+#middle {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex-grow: 3
+}
+
+#h1 {
+    align-self: flex-start;
 }
 
 #notificationDiv {
-    border: 1px solid black;
     height: 1.5em;
-    width: 30%;
+    width: 100%;
     overflow: hidden;
     position: relative;
+    top:
 }
   
 #notification {
@@ -36,4 +66,23 @@
     100% {
         transform: translateX(-200%);
     }
+}
+
+/* ================ */
+
+/* Right side of screen */
+
+#right {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+}
+
+#rightSide {
+    width: 30%;
+}
+
+.choiceResources {
+    text-align: center;
 }
