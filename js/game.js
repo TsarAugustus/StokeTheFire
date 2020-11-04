@@ -4,6 +4,127 @@ let currentFocus = undefined;
 let selectingFuel = false;
 let tickAmt = 0;
 
+let titles = {
+    y: {
+        pos: [{
+            name: 'Dictator',
+            axisYThreshold: 9
+        }, {
+            name: 'Tyrant',
+            axisYThreshold: 5
+        }, {
+            name: 'General',
+            axisYThreshold: 3
+        }], 
+        neg: [{
+            name: 'Free Person',
+            axisYThreshold: -9
+        }, {
+            name: 'Speaker',
+            axisYThreshold: -5
+        }, {
+            name: 'Advocate',
+            axisYThreshold: -3
+        }]
+    }, 
+
+    x: {
+        pos: [{
+            name: 'Extreme Right Wing',
+            axisXThreshold: 9
+        }, {
+            name: 'Radical Right Wing',
+            axisXThreshold: 5
+        }, {
+            name: 'Reactionary Right Wing',
+            axisXThreshold: 3
+        }],
+
+        neg: [{
+            name: 'Extreme Left Wing',
+            axisXThreshold: -9
+        }, {
+            name: 'Radical Left Wing',
+            axisXThreshold: -5
+        }, {
+            name: 'Reactionary Left Wing',
+            axisXThreshold: -3
+        }]
+    }
+};
+
+let playerAlignment = {
+    axisY: 0,
+    axisX: 0
+}
+
+function checkAlignmentAndTitles() {
+    let newTitle = {};
+    let findTitle = function(axisInfo) {
+        for(let axis in axisInfo) {
+            let axisName = axis.substring(axis.length - 1).toLowerCase();
+            let thresh = 'axis' + axis.substring(axis.length - 1) + 'Threshold';
+            let posOrNeg = axis.substring(0, 3);
+            
+            for(let title of titles[axisName][posOrNeg]) {
+                if(posOrNeg === 'pos' && axisInfo[axis] >= title[thresh] && !newTitle[axisName]) {
+                    newTitle[axisName] = title.name;
+                } else if (posOrNeg === 'neg' && Math.abs(axisInfo[axis]) >= Math.abs(title[thresh] && !newTitle[axisName])) {
+                    console.log(Math.abs(axisInfo[axis]),  Math.abs(title[thresh])) ;
+                    console.log(axisInfo[axis], title[thresh]);
+                    newTitle[axisName] = title.name
+                }
+            }
+            
+        }
+        
+    }
+
+    //filter x axis
+    //filter y axis
+    let filterBasedOnAxis = function(playerAxis) {
+        let axisInfo = {}
+        if(Math.sign(playerAxis.axisX) === 1) {
+            axisInfo.positiveX = playerAxis.axisX;
+            // console.log('Positive X Axis');
+        } else {
+            axisInfo.negativeX = playerAxis.axisX;
+            // console.log('Negative X Axis');
+        }
+
+        if(Math.sign(playerAxis.axisY) === 1) {
+            axisInfo.positiveY = playerAxis.axisY;
+            // console.log('Positive Y Axis');
+        } else {
+            axisInfo.negativeY = playerAxis.axisY;
+            // console.log('Negative Y Axis');
+        }
+        findTitle(axisInfo)
+    }
+
+    let playerAxis = {};
+    for(let axis in playerAlignment) {
+        playerAxis[axis] = playerAlignment[axis];
+    }
+    filterBasedOnAxis(playerAxis);
+    if(Object.keys(newTitle).length !== 0) {
+        document.getElementById('playerTitle').innerHTML = Object.values(newTitle).join('-');
+    }
+}
+
+function randomizeAlignment() {
+    let randomAlignmentIncrease = Math.round(Math.random() * 1) + 0;
+    let pickedAlignment = Object.keys(playerAlignment)[randomAlignmentIncrease];
+    // playerAlignment[pickedAlignment] = playerAlignment[pickedAlignment] + Math.floor(Math.random() * 9) + 3;
+    let ranNum = Math.ceil(Math.floor(Math.random() * 9) * (Math.round(Math.random()) ? 1: -1));
+    if(playerAlignment[pickedAlignment] < 9) {
+        playerAlignment[pickedAlignment] = playerAlignment[pickedAlignment] + ranNum;
+    }
+    
+    checkAlignmentAndTitles();
+}
+
+
 //flags
 let flags = {};
 
