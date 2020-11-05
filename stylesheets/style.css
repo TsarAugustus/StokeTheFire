@@ -13,7 +13,7 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    flex-grow: 2;
+    flex-grow: 1;
 }
 #resources {
     display: flex;
@@ -33,7 +33,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    flex-grow: 3
+    flex-grow: 2;
 }
 
 #h1 {
@@ -45,9 +45,9 @@ body {
     width: 100%;
     overflow: hidden;
     position: relative;
-    top:
 }
-  
+
+
 #notification {
     font-size: 1em;
     position: absolute;
@@ -73,6 +73,7 @@ body {
 /* Right side of screen */
 
 #right {
+    border: 1px solid black;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -86,3 +87,55 @@ body {
 .choiceResources {
     text-align: center;
 }
+
+#eventsDiv {
+    width: 100%;
+    border: 1px solid black;
+    display: flex;
+    flex-direction: row;
+}
+
+/* == */
+
+#oneTimeEventDiv {
+    border: 1px solid black;
+    display: flex;
+}
+
+.oneTimeEvent {
+    background-color: transparent;
+    border: 2px solid blue;
+}
+
+/* == */
+
+#buildingDiv {
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+}
+
+.building {
+    background-color: transparent;
+    border: 2px solid red;
+    min-width: 100%;
+}
+
+#buildingsDiv {
+    display: flex;
+    flex-direction: column;
+}
+
+/* == */
+
+#researchDiv {
+    border: 1px solid black;
+    display: flex;
+}
+
+.research {
+    background-color: transparent;
+    border: 2px solid green;
+}
+
+/* == */

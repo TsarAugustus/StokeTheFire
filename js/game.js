@@ -165,18 +165,18 @@ let resources = [{
     type: ['fuel', 'basic']
 }, {
     name: 'fire',
-    amount: 100,
+    amount: 100, //fire always starts out at 100, then decays
     cap: 100,
     decay: 1,
     type: ['fire']
 }, {
     name: 'coal',
-    amount: 5,
+    amount: 0,
     woodEquivalent: 4,
     type: ['fuel']
 }, {
     name: 'charcoal',
-    amount: 2,
+    amount: 0,
     woodEquivalent: 3,
     type: ['fuel']
 }, {
@@ -196,7 +196,7 @@ let notifications = [{
 }, {
     name: 'findWaterNotification',
     desc: 'Maybe I can collect rain?',
-    flags: ['!createRainwaterBarrel']
+    flags: ['!createRainwaterBarrel', 'createFire']
 }, {
     name: 'makeCleanWaterNotification',
     desc: 'If I boil this water, maybe I can use it.',
@@ -204,7 +204,7 @@ let notifications = [{
 }, {
     name: 'generalNotification',
     desc: 'Life is good.',
-    flags: ['createFire']
+    flags: ['createFire', 'createRainwaterBarrel']
 }]
 
 let events = [{
@@ -218,7 +218,19 @@ let events = [{
     }, {
         leaves: 10
     }],
-    building: false
+    building: false,
+    research: false
+}, {
+    name: 'createReligion',
+    desc: 'Create a Religion',
+    shorthand: 'Religion',
+    cost: [{
+        wood: 20
+    }, {
+        stone: 10
+    }, {
+        leaves: 20
+    }]
 }, {
     name: 'createHouse',
     desc: 'Create a House',
@@ -230,7 +242,8 @@ let events = [{
     }, {
         leaves: 20
     }],
-    building: true
+    building: true,
+    research: false
 }, {
     name: 'createRainwaterBarrel',
     desc: 'Create a Rainwater Barrel',
@@ -242,7 +255,34 @@ let events = [{
     }, {
         leaves: 5
     }],
-    building: true
+    building: true,
+    research: false
+}, {
+    name: 'inventStoneTools',
+    desc: 'Invent stone Tools',
+    shorthand: 'Stone Tools',
+    cost: [{
+        wood: 10
+    }, {
+        stone: 15
+    }, {
+        leaves: 5
+    }],
+    building: false,
+    research: true
+}, {
+    name: 'inventCopperTools',
+    desc: 'Invent Copper Tools',
+    shorthand: 'Copper Tools',
+    cost: [{
+        wood: 20
+    }, {
+        stone: 25
+    }, {
+        leaves: 10
+    }],
+    building: false,
+    research: true
 }];
 
 function eventToBuilding(eventName) {
@@ -264,7 +304,6 @@ function init() {
             if(!document.getElementById(resource.name)) {
                 let type = resource.type[resourceType]
                 let typeDiv = document.getElementById(type + 'Resources');
-                
                 let resourceElement = document.createElement('p');
                 resourceElement.setAttribute('id', resource.name);
                 resourceElement.innerHTML = name + ' : ' + resource.amount;
@@ -412,7 +451,7 @@ function getEvent(eventName) {
             buildings.push(newBuilding)
             let amt = '<br> # of ' + newBuilding.shorthand + 's ' + newBuilding.amount
 
-            let buildingDiv = document.getElementById('buildingDiv');
+            let buildingDiv = document.getElementById('buildingsDiv');
             let buildingElement = document.createElement('button');
             buildingElement.setAttribute('id', 'upgrade-' + findEvent[0].name);
             buildingElement.setAttribute('onclick', 'upgradeBuilding(\'' + findEvent[0].name + '\')');
@@ -441,16 +480,31 @@ function checkIfEventIsAvailable(eventName) {
                 for(let i=0; i<eventName.cost.length; i++) {
                     text.push(Object.keys(eventName.cost[i]) + ' : ' + Object.values(eventName.cost[i]));
                 }
+
+                //if button is not research, or a building, then it is a onetimeevent
+                if(eventName.research) {
+                    newEventElement.setAttribute('class', 'research');
+                } else if(eventName.building) {
+                    newEventElement.setAttribute('class', 'building');
+                } else {
+                    newEventElement.setAttribute('class', 'oneTimeEvent');
+                }
                 newEventElement.setAttribute('id', eventName.name);
                 newEventElement.setAttribute('onclick', 'getEvent(\'' + eventName.name + '\')');
                 newEventElement.innerHTML = text.join('<br>');
-                document.getElementById('eventsDiv').appendChild(newEventElement);
+                document.getElementById(newEventElement.className + 'Div').appendChild(newEventElement);
             }
         }
     });
 }
 
 function update() {
+    //check if player can purchase building, or it should be hidden
+    let eventDiv = document.getElementById('eventsDiv');
+    let eventButtons = eventDiv.querySelectorAll('button');
+    for(let button of eventButtons) {
+        // console.log(button)
+    }
     let updateResources = resources.filter(function(resource) {
         if(resource.amount <= 0) {
             document.getElementById(resource.name).style.visibility = 'hidden'
